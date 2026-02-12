@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>面试复盘助手（前端演示版）</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="hero">
+        <h1>面试复盘助手</h1>
+        <p>
+          纯前端交互版本：先完成信息输入与复盘报告展示。后续接入 API 时可无缝替换为真实 AI 分析。
+        </p>
+      </header>
+
+      <section class="card">
+        <h2>1) 输入面试信息</h2>
+        <form id="review-form">
+          <div class="field">
+            <label for="transcript">面试录音文稿（可粘贴）</label>
+            <textarea
+              id="transcript"
+              rows="8"
+              placeholder="例如：我先简单自我介绍..."
+              required
+            ></textarea>
+            <div class="inline-upload">
+              <label class="file-btn" for="transcript-file">上传文本文件（.txt）</label>
+              <input id="transcript-file" type="file" accept=".txt,text/plain" />
+              <small id="transcript-file-name"></small>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="jd">岗位 JD（可粘贴）</label>
+            <textarea
+              id="jd"
+              rows="6"
+              placeholder="例如：负责XX业务增长，需要数据分析与跨部门协作..."
+              required
+            ></textarea>
+            <div class="inline-upload">
+              <label class="file-btn" for="jd-file">上传 JD 文本（.txt）</label>
+              <input id="jd-file" type="file" accept=".txt,text/plain" />
+              <small id="jd-file-name"></small>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="interviewer-role">面试官角色</label>
+            <select id="interviewer-role" required>
+              <option value="">请选择</option>
+              <option value="业务Leader">业务 Leader</option>
+              <option value="跨部门同事">跨部门同事</option>
+              <option value="HR">HR</option>
+            </select>
+          </div>
+
+          <div class="field check-grid">
+            <label>
+              <input type="checkbox" id="need-network-benchmark" checked />
+              结合“网络常见面经与岗位要求”进行模拟评估
+            </label>
+            <label>
+              <input type="checkbox" id="strict-mode" />
+              严格模式（更强调问题点）
+            </label>
+          </div>
+
+          <button type="submit" class="primary-btn">生成复盘建议</button>
+        </form>
+      </section>
+
+      <section id="result" class="card hidden" aria-live="polite">
+        <h2>2) AI 复盘输出（本地保底方案）</h2>
+        <p class="note">
+          当前为前端本地分析逻辑（关键词与结构规则），用于演示交互流程。接入后端 API 后，结果会更精准。
+        </p>
+
+        <div class="score-box">
+          <span>综合表现评分</span>
+          <strong id="score">--</strong>
+        </div>
+
+        <div class="result-grid">
+          <article>
+            <h3>潜在问题点</h3>
+            <ul id="issue-list"></ul>
+          </article>
+
+          <article>
+            <h3>优化建议</h3>
+            <ul id="advice-list"></ul>
+          </article>
+
+          <article>
+            <h3>针对该角色的重点提醒</h3>
+            <ul id="role-focus-list"></ul>
+          </article>
+
+          <article>
+            <h3>下一轮可直接使用的话术模板</h3>
+            <pre id="template-output"></pre>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
