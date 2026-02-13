@@ -6,7 +6,6 @@
   --primary: #3b82f6;
   --primary-dark: #215fbe;
   --border: #d8e0ef;
-  --danger: #ce3a3a;
 }
 
 * {
@@ -15,7 +14,7 @@
 
 body {
   margin: 0;
-  font-family: "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+  font-family: 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
   color: var(--text);
   background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 24%, var(--bg) 100%);
 }
@@ -37,8 +36,32 @@ body {
   line-height: 1.6;
 }
 
-.card {
+.mode-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
   margin-top: 18px;
+}
+
+.mode-btn {
+  border: 1px solid #c5dafc;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2556af;
+  background: #edf3ff;
+  cursor: pointer;
+}
+
+.mode-btn.active {
+  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.card {
+  margin-top: 14px;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -99,7 +122,7 @@ select:focus {
   font-size: 0.85rem;
 }
 
-.inline-upload input[type="file"] {
+.inline-upload input[type='file'] {
   display: none;
 }
 
@@ -136,9 +159,15 @@ select:focus {
   background: var(--primary-dark);
 }
 
+.result-block {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  margin-top: 20px;
+}
+
 .note {
   color: var(--muted);
-  margin-top: -4px;
+  margin: 0;
 }
 
 .score-box {
@@ -157,9 +186,11 @@ select:focus {
   color: #1d4ea2;
 }
 
-.result-grid {
+.result-grid,
+#prepare-question-groups {
   display: grid;
   gap: 14px;
+  margin-top: 14px;
 }
 
 article {
@@ -169,9 +200,13 @@ article {
   background: #fbfcff;
 }
 
-article h3 {
-  margin: 4px 0 10px;
-  font-size: 1rem;
+article h4,
+article h5 {
+  margin: 6px 0 10px;
+}
+
+.question-group h5 {
+  color: #1d4ea2;
 }
 
 ul {
@@ -189,9 +224,4 @@ pre {
 
 .hidden {
   display: none;
-}
-
-.warn {
-  color: var(--danger);
-  font-size: 0.86rem;
 }

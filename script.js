@@ -1,4 +1,14 @@
-const form = document.querySelector('#review-form');
+const modeButtons = document.querySelectorAll('.mode-btn');
+const panels = {
+  prepare: document.querySelector('#prepare-panel'),
+  review: document.querySelector('#review-panel'),
+};
+
+const prepareForm = document.querySelector('#prepare-form');
+const prepareResult = document.querySelector('#prepare-result');
+const prepareQuestionGroups = document.querySelector('#prepare-question-groups');
+
+const reviewForm = document.querySelector('#review-form');
 const transcriptInput = document.querySelector('#transcript');
 const jdInput = document.querySelector('#jd');
 const roleInput = document.querySelector('#interviewer-role');
@@ -12,10 +22,34 @@ const templateOutput = document.querySelector('#template-output');
 const transcriptFile = document.querySelector('#transcript-file');
 const jdFile = document.querySelector('#jd-file');
 
+modeButtons.forEach((button) => {
+  button.addEventListener('click', () => switchMode(button.dataset.mode));
+});
+
 bindFileReader(transcriptFile, transcriptInput, '#transcript-file-name');
 bindFileReader(jdFile, jdInput, '#jd-file-name');
 
-form.addEventListener('submit', (event) => {
+prepareForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+
+  const projects = document.querySelector('#project-experience').value.trim();
+  const jobBackground = document.querySelector('#job-background').value.trim();
+  const details = document.querySelector('#prepare-details').value.trim();
+  const depthLevel = Number(document.querySelector('#depth-level').value);
+
+  const groups = generatePrepareQuestions({
+    projects,
+    jobBackground,
+    details,
+    depthLevel,
+  });
+
+  renderPrepareQuestions(groups);
+  prepareResult.classList.remove('hidden');
+  prepareResult.scrollIntoView({ behavior: 'smooth' });
+});
+
+reviewForm.addEventListener('submit', (event) => {
   event.preventDefault();
 
   const transcript = transcriptInput.value.trim();
@@ -32,10 +66,20 @@ form.addEventListener('submit', (event) => {
     needNetworkBenchmark,
   });
 
-  renderReport(report);
+  renderReviewReport(report);
   resultSection.classList.remove('hidden');
   resultSection.scrollIntoView({ behavior: 'smooth' });
 });
+
+function switchMode(mode) {
+  modeButtons.forEach((button) => {
+    button.classList.toggle('active', button.dataset.mode === mode);
+  });
+
+  Object.entries(panels).forEach(([panelMode, panel]) => {
+    panel.classList.toggle('hidden', panelMode !== mode);
+  });
+}
 
 function bindFileReader(fileInput, targetTextarea, fileNameSelector) {
   const fileNameNode = document.querySelector(fileNameSelector);
@@ -48,6 +92,113 @@ function bindFileReader(fileInput, targetTextarea, fileNameSelector) {
     const text = await file.text();
     targetTextarea.value = text;
   });
+}
+
+function generatePrepareQuestions({ projects, jobBackground, details, depthLevel }) {
+  const projectItems = projects
+    .split(/\n+/)
+    .map((line) => line.replace(/^[-•\d.\s]+/, '').trim())
+    .filter(Boolean);
+
+  const fallbackProject = '你最近最能体现价值的核心项目';
+  const finalProjects = projectItems.length ? projectItems : [fallbackProject];
+
+  const keySkills = extractTopKeywords(`${jobBackground} ${details}`, 6);
+  const backgroundHint = keySkills.length ? `（岗位重点：${keySkills.join('、')}）` : '';
+
+  return finalProjects.map((project) => buildQuestionLayers(project, keySkills, backgroundHint, depthLevel));
+}
+
+function buildQuestionLayers(project, keySkills, backgroundHint, depthLevel) {
+  const skillA = keySkills[0] || '业务理解';
+  const skillB = keySkills[1] || '数据分析';
+  const skillC = keySkills[2] || '跨团队协作';
+
+  const layers = [
+    {
+      title: 'L1｜基础还原（你做了什么）',
+      questions: [
+        `请用 1 分钟介绍项目“${project}”的背景、目标、你的角色与结果。${backgroundHint}`,
+        `这个项目最关键的成功指标是什么？为什么选它，而不是其他指标？`,
+        `你在项目中最核心的 2-3 个动作分别是什么？`,
+      ],
+    },
+    {
+      title: 'L2｜能力验证（你为什么能做成）',
+      questions: [
+        `围绕“${skillA}”，你做过最有效的一次判断是什么？依据是什么？`,
+        `围绕“${skillB}”，你如何定义问题并验证方案有效？`,
+        `如果把这个项目交给别人复刻，哪些方法可以被标准化沉淀？`,
+      ],
+    },
+    {
+      title: 'L3｜压力追问（你如何处理复杂情况）',
+      questions: [
+        `项目推进中遇到最大阻力是什么？你如何拆解并推动各方达成一致？（重点看 ${skillC}）`,
+        '如果资源被砍掉 30%，你会怎么做优先级重排？哪些目标必须保、哪些可降级？',
+        '请讲一个“差点失败”的时刻：你如何补救、复盘后改了什么机制？',
+      ],
+    },
+    {
+      title: 'L4｜迁移与战略（你是否可持续复用）',
+      questions: [
+        '如果入职后让你在 90 天内复制这类成果，你会如何制定路线图与里程碑？',
+        '这个项目中你沉淀了哪些可迁移的方法论？在新业务里会如何调整？',
+        '站在更高视角，这个项目对业务长期竞争力的意义是什么？',
+      ],
+    },
+  ];
+
+  return {
+    project,
+    layers: layers.slice(0, depthLevel),
+  };
+}
+
+function renderPrepareQuestions(groups) {
+  prepareQuestionGroups.innerHTML = '';
+
+  groups.forEach((group) => {
+    const wrapper = document.createElement('article');
+    wrapper.className = 'question-group';
+
+    const heading = document.createElement('h4');
+    heading.textContent = `项目：${group.project}`;
+    wrapper.appendChild(heading);
+
+    group.layers.forEach((layer) => {
+      const layerTitle = document.createElement('h5');
+      layerTitle.textContent = layer.title;
+      wrapper.appendChild(layerTitle);
+
+      const ul = document.createElement('ul');
+      layer.questions.forEach((question) => {
+        const li = document.createElement('li');
+        li.textContent = question;
+        ul.appendChild(li);
+      });
+
+      wrapper.appendChild(ul);
+    });
+
+    prepareQuestionGroups.appendChild(wrapper);
+  });
+}
+
+function extractTopKeywords(text, topN) {
+  const stopWords = new Set(['负责', '需要', '以及', '我们', '你们', '这个', '那个', '进行', '相关', '经验', '能力']);
+  const freq = new Map();
+
+  tokenize(text)
+    .filter((word) => word.length >= 2 && !stopWords.has(word))
+    .forEach((word) => {
+      freq.set(word, (freq.get(word) || 0) + 1);
+    });
+
+  return [...freq.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, topN)
+    .map(([word]) => word);
 }
 
 function localAnalyze({ transcript, jd, role, strictMode, needNetworkBenchmark }) {
@@ -126,7 +277,10 @@ function tokenize(text) {
 }
 
 function countMatches(text, keywords) {
-  return keywords.reduce((total, keyword) => total + ((text.match(new RegExp(keyword, 'g')) || []).length), 0);
+  return keywords.reduce(
+    (total, keyword) => total + ((text.match(new RegExp(keyword, 'g')) || []).length),
+    0,
+  );
 }
 
 function containsAny(text, keywords) {
@@ -171,7 +325,7 @@ function buildTemplate(role) {
 ${roleTail}`;
 }
 
-function renderReport(report) {
+function renderReviewReport(report) {
   scoreOutput.textContent = `${report.score} / 100`;
   renderList(issueList, report.issues);
   renderList(adviceList, report.advice);
