@@ -117,6 +117,8 @@ function buildQuestionLayers(project, keySkills, backgroundHint, depthLevel) {
   const layers = [
     {
       title: 'L1｜基础还原（你做了什么）',
+      approach:
+        '回答思路：用 STAR 快速搭建主线。先一句话给结论，再讲背景与目标，重点突出你的职责边界，最后用 1-2 个结果指标收尾。',
       questions: [
         `请用 1 分钟介绍项目“${project}”的背景、目标、你的角色与结果。${backgroundHint}`,
         `这个项目最关键的成功指标是什么？为什么选它，而不是其他指标？`,
@@ -125,6 +127,8 @@ function buildQuestionLayers(project, keySkills, backgroundHint, depthLevel) {
     },
     {
       title: 'L2｜能力验证（你为什么能做成）',
+      approach:
+        '回答思路：围绕“判断依据 + 方法动作 + 结果证明”来讲，不只说做了什么，更要说为什么这么做，以及如何验证做对了。',
       questions: [
         `围绕“${skillA}”，你做过最有效的一次判断是什么？依据是什么？`,
         `围绕“${skillB}”，你如何定义问题并验证方案有效？`,
@@ -133,6 +137,8 @@ function buildQuestionLayers(project, keySkills, backgroundHint, depthLevel) {
     },
     {
       title: 'L3｜压力追问（你如何处理复杂情况）',
+      approach:
+        '回答思路：先给出当时的约束条件（资源/时间/冲突），再说明你的取舍逻辑与推进动作，最后讲结果和复盘，让面试官看到抗压与 owner 意识。',
       questions: [
         `项目推进中遇到最大阻力是什么？你如何拆解并推动各方达成一致？（重点看 ${skillC}）`,
         '如果资源被砍掉 30%，你会怎么做优先级重排？哪些目标必须保、哪些可降级？',
@@ -141,6 +147,8 @@ function buildQuestionLayers(project, keySkills, backgroundHint, depthLevel) {
     },
     {
       title: 'L4｜迁移与战略（你是否可持续复用）',
+      approach:
+        '回答思路：把项目经验抽象成方法论，再落到新场景的执行路径。建议用“90 天计划 + 里程碑 + 风险预案”来体现战略视角。',
       questions: [
         '如果入职后让你在 90 天内复制这类成果，你会如何制定路线图与里程碑？',
         '这个项目中你沉淀了哪些可迁移的方法论？在新业务里会如何调整？',
@@ -170,6 +178,11 @@ function renderPrepareQuestions(groups) {
       const layerTitle = document.createElement('h5');
       layerTitle.textContent = layer.title;
       wrapper.appendChild(layerTitle);
+
+      const approach = document.createElement('p');
+      approach.className = 'layer-approach';
+      approach.textContent = layer.approach;
+      wrapper.appendChild(approach);
 
       const ul = document.createElement('ul');
       layer.questions.forEach((question) => {
