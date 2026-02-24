@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>面试助手（Prepare + Review）</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="hero">
+        <h1>面试助手</h1>
+        <p>
+          先做前端可用版：一个页面支持 <strong>Prepare（面试准备）</strong> 和
+          <strong>Review（面试复盘）</strong>。后续接 API 时可替换本地逻辑。
+        </p>
+      </header>
+
+      <nav class="mode-switch" aria-label="模式切换">
+        <button class="mode-btn active" data-mode="prepare" type="button">Prepare｜面试准备</button>
+        <button class="mode-btn" data-mode="review" type="button">Review｜复盘助手</button>
+      </nav>
+
+      <section id="prepare-panel" class="card mode-panel">
+        <h2>Prepare：基于项目经历生成分层追问</h2>
+        <form id="prepare-form">
+          <div class="field">
+            <label for="project-experience">项目经历（可粘贴，建议一行一个项目）</label>
+            <textarea
+              id="project-experience"
+              rows="7"
+              placeholder="示例：\n- 搭建新用户增长漏斗，负责策略和AB实验\n- 主导客服系统改版，联动产品/研发/运营"
+              required
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label for="job-background">岗位背景（JD / 业务背景）</label>
+            <textarea
+              id="job-background"
+              rows="6"
+              placeholder="示例：负责增长与留存，强调跨部门协作、数据驱动、项目推进能力"
+              required
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label for="prepare-details">补充细节（可选）</label>
+            <textarea
+              id="prepare-details"
+              rows="4"
+              placeholder="示例：目标公司是SaaS，团队目前资源紧，重点看 owner 意识与复杂项目推进"
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label for="depth-level">追问深挖层级</label>
+            <select id="depth-level">
+              <option value="2">2 层（基础版）</option>
+              <option value="3" selected>3 层（推荐）</option>
+              <option value="4">4 层（高压模拟）</option>
+            </select>
+          </div>
+
+          <button type="submit" class="primary-btn">生成分层问题清单</button>
+        </form>
+
+        <section id="prepare-result" class="result-block hidden" aria-live="polite">
+          <h3>分层问题输出</h3>
+          <p class="note">建议从 L1 开始演练，再逐层深挖到 L3/L4。</p>
+          <div id="prepare-question-groups"></div>
+        </section>
+      </section>
+
+      <section id="review-panel" class="card mode-panel hidden">
+        <h2>Review：复盘助手</h2>
+        <form id="review-form">
+          <div class="field">
+            <label for="transcript">面试录音文稿（可粘贴）</label>
+            <textarea
+              id="transcript"
+              rows="8"
+              placeholder="例如：我先简单自我介绍..."
+              required
+            ></textarea>
+            <div class="inline-upload">
+              <label class="file-btn" for="transcript-file">上传文本文件（.txt）</label>
+              <input id="transcript-file" type="file" accept=".txt,text/plain" />
+              <small id="transcript-file-name"></small>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="jd">岗位 JD（可粘贴）</label>
+            <textarea
+              id="jd"
+              rows="6"
+              placeholder="例如：负责XX业务增长，需要数据分析与跨部门协作..."
+              required
+            ></textarea>
+            <div class="inline-upload">
+              <label class="file-btn" for="jd-file">上传 JD 文本（.txt）</label>
+              <input id="jd-file" type="file" accept=".txt,text/plain" />
+              <small id="jd-file-name"></small>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="interviewer-role">面试官角色</label>
+            <select id="interviewer-role" required>
+              <option value="">请选择</option>
+              <option value="业务Leader">业务 Leader</option>
+              <option value="跨部门同事">跨部门同事</option>
+              <option value="HR">HR</option>
+            </select>
+          </div>
+
+          <div class="field check-grid">
+            <label>
+              <input type="checkbox" id="need-network-benchmark" checked />
+              结合“网络常见面经与岗位要求”进行模拟评估
+            </label>
+            <label>
+              <input type="checkbox" id="strict-mode" />
+              严格模式（更强调问题点）
+            </label>
+          </div>
+
+          <button type="submit" class="primary-btn">生成复盘建议</button>
+        </form>
+
+        <section id="result" class="result-block hidden" aria-live="polite">
+          <h3>AI 复盘输出（本地保底方案）</h3>
+          <p class="note">
+            当前为前端本地分析逻辑（关键词与结构规则），用于演示交互流程。接入后端 API 后，结果会更精准。
+          </p>
+
+          <div class="score-box">
+            <span>综合表现评分</span>
+            <strong id="score">--</strong>
+          </div>
+
+          <div class="result-grid">
+            <article>
+              <h4>潜在问题点</h4>
+              <ul id="issue-list"></ul>
+            </article>
+
+            <article>
+              <h4>优化建议</h4>
+              <ul id="advice-list"></ul>
+            </article>
+
+            <article>
+              <h4>针对该角色的重点提醒</h4>
+              <ul id="role-focus-list"></ul>
+            </article>
+
+            <article>
+              <h4>下一轮可直接使用的话术模板</h4>
+              <pre id="template-output"></pre>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
